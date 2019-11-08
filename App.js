@@ -1,49 +1,81 @@
-import React from "react";
-import { View, SafeAreaView } from "react-native";
-import { StreamChat } from "stream-chat";
-import {
-  Chat,
-  Channel,
-  MessageList,
-  MessageInput,
-} from "stream-chat-expo";
+import React, { PureComponent } from 'react'
+import { KeyboardAvoidingView, Platform, StatusBar, View, StyleSheet, Image } from 'react-native'
+import { Scene, Router, Stack } from 'react-native-router-flux';
+import * as Font from 'expo-font';
+import * as Permissions from 'expo-permissions';
+import Constants from 'expo-constants';
+import {Home} from './src/screens/home';
+import { screenWidth, screenHeight } from './config/static';
 
-const chatClient = new StreamChat('f8wwud5et5jd');
-const userToken =
-  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoidGlueS1sYWItOSJ9.xxi2iXxKgFyDnkDHqVr56MU2wd37DRx3dKTzNUSZOx4';
+const MyStatusBar = ({ backgroundColor, ...props }) => (
+  <View style={[styles.statusBar, { backgroundColor }]}>
+    <StatusBar translucent backgroundColor={backgroundColor} {...props} />
+  </View>
+);
 
-const user = {
-  id: 'tiny-lab-9',
-  name: 'Tiny lab',
-  image:
-    'https://stepupandlive.files.wordpress.com/2014/09/3d-animated-frog-image.jpg',
-};
+const MAIN = [
+  { key: 'home', component: Home },
+]
 
-chatClient.setUser(user, userToken);
+export default class App extends PureComponent {
 
-class ChannelScreen extends React.Component {
+  state = {
+    fontLoaded: false,
+  }
+
+  async componentDidMount() {
+    this.getPermissionAsync(); //ios image picker available
+
+    await Font.loadAsync({
+      'Muli-Light': require('../assets/fonts/Muli-Light.ttf'),
+    });
+
+    this.setState({ fontLoaded: true });
+  }
+
+  getPermissionAsync = async () => {
+    if (Constants.platform.ios) {
+      const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+      if (status !== 'granted') {
+        alert('Sorry, we need camera roll permissions to make this work!');
+      }
+    }
+  }
+
   render() {
-    const channel = chatClient.channel("messaging", "tiny-lab-9");
-    channel.watch();
+
+    const { fontLoaded } = this.state;
+    if (!fontLoaded) {
+      return <Image source={require('../assets/splash.png')} style={{ width: screenWidth, height: screenHeight }} />
+    }
 
     return (
-      <SafeAreaView>
-        <Chat client={chatClient}>
-          <Channel channel={channel}>
-            <View style={{ display: "flex", height: "100%" }}>
-              <MessageList />
-              <MessageInput />
-            </View>
-          </Channel>
-        </Chat>
-      </SafeAreaView>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : null} enabled
+        style={{ flex: 1 }}
+      >
+        <MyStatusBar backgroundColor="#1e88e5" barStyle="light-content" />
+        <Router>
+          <Stack key='root'>
+            {MAIN.map(a => (<Scene key={a.key} component={a.component} hideNavBar />))}
+          </Stack>
+        </Router>
+
+      </KeyboardAvoidingView>
     );
   }
 }
 
-export default class App extends React.Component {
-  render() {
-    return <ChannelScreen />;
-  }
-}
-    
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  statusBar: {
+    padding: 10,
+    height: 24,
+  },
+  content: {
+    flex: 1,
+    backgroundColor: '#2699FB',
+  },
+});
