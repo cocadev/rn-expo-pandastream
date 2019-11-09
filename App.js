@@ -1,11 +1,13 @@
 import React, { PureComponent } from 'react'
 import { KeyboardAvoidingView, Platform, StatusBar, View, StyleSheet, Image } from 'react-native'
 import { Scene, Router, Stack } from 'react-native-router-flux';
+import { screenWidth, screenHeight } from './src/config/static';
+import Constants from 'expo-constants';
+import Normal from './src/screens/getstreamchat/normal';
+import Home from './src/screens/home';
 import * as Font from 'expo-font';
 import * as Permissions from 'expo-permissions';
-import Constants from 'expo-constants';
-import {Home} from './src/screens/home';
-import { screenWidth, screenHeight } from './config/static';
+import All from './src/screens/getstreamchat/all';
 
 const MyStatusBar = ({ backgroundColor, ...props }) => (
   <View style={[styles.statusBar, { backgroundColor }]}>
@@ -15,6 +17,9 @@ const MyStatusBar = ({ backgroundColor, ...props }) => (
 
 const MAIN = [
   { key: 'home', component: Home },
+  { key: 'normal_chat', component: Normal },
+  { key: 'all_chat', component: All },
+
 ]
 
 export default class App extends PureComponent {
@@ -27,7 +32,8 @@ export default class App extends PureComponent {
     this.getPermissionAsync(); //ios image picker available
 
     await Font.loadAsync({
-      'Muli-Light': require('../assets/fonts/Muli-Light.ttf'),
+      'Muli-Light': require('./assets/fonts/Muli-Light.ttf'),
+      'Muli-Italic': require('./assets/fonts/Muli-Italic.ttf'),     
     });
 
     this.setState({ fontLoaded: true });
@@ -46,7 +52,7 @@ export default class App extends PureComponent {
 
     const { fontLoaded } = this.state;
     if (!fontLoaded) {
-      return <Image source={require('../assets/splash.png')} style={{ width: screenWidth, height: screenHeight }} />
+      return <Image source={require('./assets/splash.png')} style={{ width: screenWidth, height: screenHeight }} />
     }
 
     return (

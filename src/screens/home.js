@@ -1,48 +1,47 @@
 import React from "react";
-import { View, SafeAreaView } from "react-native";
-import { StreamChat } from "stream-chat";
-import {
-  Chat,
-  Channel,
-  MessageList,
-  MessageInput,
-} from "stream-chat-expo";
-
-const chatClient = new StreamChat('f8wwud5et5jd');
-const userToken =
-  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoidGlueS1sYWItOSJ9.xxi2iXxKgFyDnkDHqVr56MU2wd37DRx3dKTzNUSZOx4';
-
-const user = {
-  id: 'tiny-lab-9',
-  name: 'Tiny lab',
-  image:
-    'https://stepupandlive.files.wordpress.com/2014/09/3d-animated-frog-image.jpg',
-};
-
-chatClient.setUser(user, userToken);
-
-class ChannelScreen extends React.Component {
-  render() {
-    const channel = chatClient.channel("messaging", "tiny-lab-9");
-    channel.watch();
-
-    return (
-      <SafeAreaView>
-        <Chat client={chatClient}>
-          <Channel channel={channel}>
-            <View style={{ display: "flex", height: "100%" }}>
-              <MessageList />
-              <MessageInput />
-            </View>
-          </Channel>
-        </Chat>
-      </SafeAreaView>
-    );
-  }
-}
+import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Actions } from "react-native-router-flux";
 
 export default class Home extends React.Component {
-  render() {
-    return <ChannelScreen />;
-  }
+    render() {
+        return (
+            <View style={styles.container}>
+                <Text style={styles.title}>{'Panda Warrior'}</Text>
+                <TouchableOpacity style={styles.btn} onPress={()=>Actions.normal_chat()}>
+                    <Text style={styles.text}>All Chat</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.btn} onPress={()=>Actions.all_chat()}>
+                    <Text style={styles.text}>Stream Chat</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#000'
+    },
+    btn: {
+        marginVertical: 12,
+        padding: 10,
+        borderWidth: 1,
+        borderColor: 'purple',
+        borderRadius: 12,
+        width: 300
+    },
+    title: {
+        fontFamily: 'Muli-Italic',
+        marginVertical: 40,
+        fontSize: 60,
+        color: 'purple'
+    },
+    text: {
+        color: '#fff',
+        fontSize: 30,
+        fontFamily: 'Muli-Light'
+    }
+});
